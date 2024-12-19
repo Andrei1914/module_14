@@ -1,0 +1,34 @@
+import sqlite3
+
+connection = sqlite3.connect("database.db")
+cursor = connection.cursor()
+
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS Users(
+    id INTEGER PRIMARY KEY,
+    Username TEXT NOT NULL,
+    Email TEXT NOT NULL,
+    Age INTEGER,
+    balance INTEGER NOT NULL
+)
+''')
+
+for i in range(1, 11):
+    cursor.execute("INSERT INTO Users(Username, Email, Age, balance) VALUES(?, ?, ?, ?)", \
+    (f"User{i}", f"example{i}@gmail.com", int("10")*i, 1000))
+
+for i in range(1, 11):
+    cursor.execute("UPDATE Users SET balance = ? WHERE id % 2 == 0", ("500", ))
+
+for i in range(1, 11):
+    if i % 3 == 0:
+        cursor.execute("DELETE FROM Users WHERE Id = ?", (i, ))
+
+cursor.execute("SELECT * FROM Users WHERE age != 60")
+all_data_users = cursor.fetchall()
+
+for data in all_data_users:
+    print(f"Имя:{data[1]}, почта:{data[2]}, возраст: {data[3]}, баланс: {data[4]}")
+
+connection.commit()
+connection.close()
